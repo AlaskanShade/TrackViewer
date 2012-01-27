@@ -33,8 +33,12 @@ namespace TrackViewer.Domain.Concrete
 		public void SaveTrack(Track t)
 		{
 			t.Data = (from trk in tracks where trk.TrackID == t.TrackID select trk.Data).First();
-			tracks.Attach(t);
-			tracks.Context.Refresh(RefreshMode.KeepCurrentValues, t);
+			try
+			{
+				tracks.Attach(t);
+				tracks.Context.Refresh(RefreshMode.KeepCurrentValues, t);
+			}
+			catch { }
 			tracks.Context.SubmitChanges();
 		}
 
@@ -42,8 +46,13 @@ namespace TrackViewer.Domain.Concrete
 		{
 			t.Data = (from trk in tracks where trk.TrackID == t.TrackID select trk.Data).First();
 			t.TrimPoints(t.TrimStart, t.TrimEnd);
-			tracks.Attach(t);
-			tracks.Context.Refresh(RefreshMode.KeepCurrentValues, t);
+			t.GenerateMetadata();
+			try
+			{
+				tracks.Attach(t);
+				tracks.Context.Refresh(RefreshMode.KeepCurrentValues, t);
+			}
+			catch { }
 			tracks.Context.SubmitChanges();
 		}
 

@@ -56,7 +56,9 @@
     <Reference Include="System.Data.DataSetExtensions">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Web.Mvc, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Web.Mvc, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -72,39 +74,49 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Areas\Calendar\CalendarAreaRegistration.cs" />
+    <Compile Include="Areas\Calendar\Controllers\CalendarController.cs" />
+    <Compile Include="Areas\Calendar\Models\CalendarRepository.cs" />
+    <Compile Include="Areas\Calendar\Models\DayData.cs" />
+    <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\TrackController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Infrastructure\NinjectControllerFactory.cs" />
     <Compile Include="Infrastructure\TrackStoreServices.cs" />
+    <Compile Include="LogOn.aspx.cs">
+      <DependentUpon>LogOn.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="LogOn.aspx.designer.cs">
+      <DependentUpon>LogOn.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Models\AccountModels.cs" />
+    <Compile Include="Models\LoginViewModel.cs" />
+    <Compile Include="Models\RegisterViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Areas\Calendar\Views\Calendar\Calendar.aspx" />
+    <Content Include="Areas\Calendar\Views\Calendar\Day.ascx" />
+    <Content Include="Content\jquery.jqplot.min.css" />
     <Content Include="Content\mm_20_green.png" />
     <Content Include="Content\mm_20_red.png" />
     <Content Include="Content\mm_20_shadow.png" />
-    <Content Include="Content\redmond\images\ui-bg_flat_0_aaaaaa_40x100.png" />
-    <Content Include="Content\redmond\images\ui-bg_flat_55_fbec88_40x100.png" />
-    <Content Include="Content\redmond\images\ui-bg_glass_75_d0e5f5_1x400.png" />
-    <Content Include="Content\redmond\images\ui-bg_glass_85_dfeffc_1x400.png" />
-    <Content Include="Content\redmond\images\ui-bg_glass_95_fef1ec_1x400.png" />
-    <Content Include="Content\redmond\images\ui-bg_gloss-wave_55_5c9ccc_500x100.png" />
-    <Content Include="Content\redmond\images\ui-bg_inset-hard_100_f5f8f9_1x100.png" />
-    <Content Include="Content\redmond\images\ui-bg_inset-hard_100_fcfdfd_1x100.png" />
-    <Content Include="Content\redmond\images\ui-icons_217bc0_256x240.png" />
-    <Content Include="Content\redmond\images\ui-icons_2e83ff_256x240.png" />
-    <Content Include="Content\redmond\images\ui-icons_469bdd_256x240.png" />
-    <Content Include="Content\redmond\images\ui-icons_6da8d5_256x240.png" />
-    <Content Include="Content\redmond\images\ui-icons_cd0a0a_256x240.png" />
-    <Content Include="Content\redmond\images\ui-icons_d8e7f3_256x240.png" />
-    <Content Include="Content\redmond\images\ui-icons_f9bd01_256x240.png" />
-    <Content Include="Content\redmond\jquery-ui-1.8.13.custom.css" />
     <Content Include="Global.asax" />
+    <Content Include="LogOn.aspx" />
+    <Content Include="Scripts\jqplot\jqplot.dateAxisRenderer.min.js" />
+    <Content Include="Scripts\jquery.jqplot.min.js" />
+    <Content Include="Views\Account\ChangePassword.aspx" />
+    <Content Include="Views\Account\ChangePasswordSuccess.aspx" />
+    <Content Include="Views\Account\Login.aspx" />
+    <Content Include="Views\Account\Register.aspx" />
     <Content Include="Views\Track\Edit.aspx" />
     <Content Include="Views\Track\List.aspx" />
     <Content Include="Views\Track\Upload.aspx" />
+    <Content Include="Views\Track\Map.ascx" />
+    <Content Include="Views\Track\View.aspx" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -113,9 +125,6 @@
       <DependentUpon>Web.config</DependentUpon>
     </Content>
     <Content Include="Content\Site.css" />
-    <Content Include="Scripts\jquery-1.4.1.js" />
-    <Content Include="Scripts\jquery-1.4.1.min.js" />
-    <Content Include="Scripts\jquery-1.4.1-vsdoc.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate-vsdoc.js" />
@@ -125,16 +134,13 @@
     <Content Include="Scripts\MicrosoftMvcAjax.debug.js" />
     <Content Include="Scripts\MicrosoftMvcValidation.js" />
     <Content Include="Scripts\MicrosoftMvcValidation.debug.js" />
-    <Content Include="Views\Home\About.aspx" />
-    <Content Include="Views\Home\Index.aspx" />
     <Content Include="Views\Shared\Error.aspx" />
     <Content Include="Views\Shared\LogOnUserControl.ascx" />
     <Content Include="Views\Shared\Site.Master" />
     <Content Include="Views\Web.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
-    <Folder Include="Models\" />
+    <Folder Include="Areas\Calendar\Views\Shared\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TrackViewer.Domain\TrackViewer.Domain.csproj">
@@ -144,6 +150,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App_Data\TrackStore.db" />
+    <Content Include="Areas\Calendar\Views\Web.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />

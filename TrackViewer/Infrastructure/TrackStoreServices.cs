@@ -13,7 +13,10 @@ namespace TrackViewer.Infrastructure
 	{
 		public override void Load()
 		{
+			// SQL
 			Bind<ITracksRepository>().To<TracksRepository>().WithConstructorArgument("connectionString", WebConfigurationManager.ConnectionStrings["TrackStoreEntities"].ConnectionString);
+			// Files
+			//Bind<ITracksRepository>().To<TracksFileRepository>().WithConstructorArgument("filePath", HttpContext.Current.Server.MapPath("~/App_Data"));
 		}
 	}
 }

@@ -7,28 +7,42 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
 
     <h2>Tracks</h2>
+	<% if (User.IsInRole("Admin")) { %>
 	<%: Html.ActionLink("Upload a new file", "Upload") %>
-	<%: Html.ActionLink("Import All", "ImportAll") %>
+	<%: Html.ActionLink("Update Metadata", "UpdateMetadata") %>
+	<% } %>
 
 	<table>
 		<thead>
 			<tr>
-				<th>Source</th>
+				<th>Date</th>
+				<th>Type</th>
 				<th>Name</th>
+				<th>Distance</th>
+				<th>Time</th>
 				<th>Points</th>
+				<% if (User.IsInRole("Admin")) { %>
+				<th></th>
+				<% } %>
 				<th></th>
 				<th></th>
 			</tr>
 		</thead>
 		<% foreach (var track in Model) { %>
 			<tr>
-				<td><%: track.SourceFile %></td>
+				<td><%: track.TrackDate.ToShortDateString() %></td>
+				<td><%: track.TypeOfTravel %></td>
 				<td><%: track.Name %></td>
+				<td><%: (track.TotalDistance / 1609.344).ToString("N") %> miles</td>
+				<td><%: track.TotalTime.TotalHours.ToString("N") %> hours</td>
 				<td><%: track.GetPoints().Count() %></td>
+				<% if (User.IsInRole("Admin")) { %>
 				<td><% using (Html.BeginForm("Delete", "Track")) { %>
-					<%: Html.Hidden("trackId", track.TrackID) %>
+					<%: Html.Hidden("trackId", track.TrackID)%>
 					<button type="submit">Delete</button>
 				<% } %></td>
+				<% } %>
+				<td><%: Html.ActionLink("View", "View", new { id = track.TrackID }) %></td>
 				<td><%: Html.ActionLink("Edit", "Edit", new { id = track.TrackID }) %></td>
 			</tr>
 		<% } %>

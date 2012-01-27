@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using TrackViewer.Domain;
 using TrackViewer.Domain.Abstract;
 using TrackViewer.Domain.Mock;
 using TrackViewer.Domain.Concrete;
@@ -12,6 +13,7 @@ using TrackViewer.Domain.Entities;
 
 namespace TrackViewer.Controllers
 {
+	//[Authorize(Users="Shade")]
     public class TrackController : Controller
     {
 		private ITracksRepository _tracksRepository;
@@ -24,13 +26,27 @@ namespace TrackViewer.Controllers
 
         public ActionResult List()
         {
-            return View(_tracksRepository.Tracks.OrderBy(t => t.SourceFile).ToList());
+            return View(_tracksRepository.Tracks.OrderByDescending(t => t.TrackDate).ToList());
         }
+
+		// TODO: trim charts
+		// TODO: Add markers on map for each hour/15 min/etc.
+		[HttpGet]
+		public ActionResult View(int id)
+		{
+			Track trk = _tracksRepository.Tracks.Where(t => t.TrackID == id).FirstOrDefault();
+			trk.GenerateMetadata();
+			ViewData["TravelMethods"] = trk.TypeOfTravel.ToSelectList();
+			return View(trk);
+		}
 
 		[HttpGet]
 		public ActionResult Edit(int id)
 		{
-			return View(_tracksRepository.Tracks.Where(t => t.TrackID == id).FirstOrDefault());
+			Track trk = _tracksRepository.Tracks.Where(t => t.TrackID == id).FirstOrDefault();
+			trk.GenerateMetadata();
+			ViewData["TravelMethods"] = trk.TypeOfTravel.ToSelectList();
+			return View(trk);
 		}
 
 		[HttpPost]
@@ -48,50 +64,55 @@ namespace TrackViewer.Controllers
 			return View(t);
 		}
 
-		public ActionResult ImportAll()
+		public ActionResult UpdateMetadata()
 		{
-			int total = 0, imported = 0;
-			foreach (var file in System.IO.Directory.GetFiles(@"C:\Users\michael\Documents\My Dropbox\GPS\Tracks", "201?????.gpx"))
+			foreach (var trk in _tracksRepository.Tracks)
 			{
-				var source = System.IO.Path.GetFileName(file);
-				total++;
-				if (_tracksRepository.Tracks.Count(trk => trk.SourceFile == source) == 0)
-				{
-					imported++;
-
-					using (System.IO.FileStream fs = System.IO.File.OpenRead(file))
-						foreach (var t in Track.ParseGpx(source, fs))
-							if (t.GetPoints().Length > 10)
-								_tracksRepository.AddTrack(t);
-				}
+				var t = trk.Clone();
+				t.GenerateMetadata();
+				_tracksRepository.SaveTrack(t);
 			}
 			return new RedirectResult("List");
 		}
 
+		[Authorize(Roles="Admin")]
 		[HttpGet]
 		public ActionResult Upload()
 		{
 			return View();
 		}
 
+		[Authorize(Roles="Admin")]
 		[HttpPost]
 		public ActionResult Upload(HttpPostedFileBase gpx)
 		{
 			string source = System.IO.Path.GetFileName(gpx.FileName);
-			if (_tracksRepository.Tracks.Count(trk => trk.SourceFile == source) > 0)
+			//if (_tracksRepository.Tracks.Count(trk => trk.SourceFile == source) > 0)
+			//{
+			//    ViewData["message"] = "File already uploaded";
+			//    return View();
+			//}
+			foreach (var t in Track.ParseGpx(source, gpx.InputStream))
 			{
-				ViewData["message"] = "File already uploaded";
-				return View();
-			}
-            foreach (var t in TrackViewer.Domain.Entities.Track.ParseGpx(source, gpx.InputStream))
+				t.GenerateMetadata();
 				_tracksRepository.AddTrack(t);
+			}
 			return RedirectToAction("List");
 		}
 
+		[Authorize(Roles="Admin")]
 		public ActionResult Delete(int trackId)
 		{
 			_tracksRepository.DeleteTrack(trackId);
 			return RedirectToAction("List");
+		}
+
+		
+		public JsonResult TrackData(int id, string type)
+		{
+			var trk = _tracksRepository.Tracks.FirstOrDefault(t => t.TrackID == id);
+			if (trk == null) return Json(null);
+			return Json(trk.GetTrackData(type), JsonRequestBehavior.AllowGet);
 		}
     }
 }
